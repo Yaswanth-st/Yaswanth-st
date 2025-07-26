@@ -1,0 +1,12 @@
+# Netlify redirects file
+# Redirect API calls to backend
+/api/* https://your-backend-api.herokuapp.com/api/:splat 200
+
+# Redirect admin to backend
+/admin/* https://your-backend-api.herokuapp.com/admin/:splat 200
+
+# SPA fallback for client-side routing
+/app/* /index.html 200
+
+# 404 fallback
+/* /404.html 404
