@@ -1,0 +1,384 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block page_title %}Smart Timetable Dashboard{% endblock %}
+
+{% block header_actions %}
+    <div class="d-flex gap-2">
+        <a href="{% url 'timetable_generate' %}" class="btn btn-primary">
+            <i class="fas fa-magic me-2"></i>Generate Timetable
+        </a>
+        <a href="/admin/" class="btn btn-outline-secondary">
+            <i class="fas fa-cog me-2"></i>Admin
+        </a>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <!-- Statistics Cards -->
+    <div class="row mb-5">
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="stats-card">
+                <div class="stats-number">{{ total_staff }}</div>
+                <div class="stats-label">
+                    <i class="fas fa-users me-1"></i>
+                    Staff Members
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="stats-card" style="background: linear-gradient(135deg, #16a34a, #22c55e);">
+                <div class="stats-number">{{ total_subjects }}</div>
+                <div class="stats-label">
+                    <i class="fas fa-book me-1"></i>
+                    Subjects
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="stats-card" style="background: linear-gradient(135deg, #d97706, #f59e0b);">
+                <div class="stats-number">{{ total_classes }}</div>
+                <div class="stats-label">
+                    <i class="fas fa-graduation-cap me-1"></i>
+                    Class Sections
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6 mb-4">
+            <div class="stats-card" style="background: linear-gradient(135deg, #8b5cf6, #a855f7);">
+                <div class="stats-number">{{ total_rooms }}</div>
+                <div class="stats-label">
+                    <i class="fas fa-door-open me-1"></i>
+                    Rooms Available
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Feature Cards -->
+    <div class="row mb-5">
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-robot me-2"></i>
+                        AI-Powered Generation
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Advanced Genetic Algorithm automatically generates optimal timetables considering all constraints and preferences.</p>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check text-success me-2"></i>Conflict-free scheduling</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Workload optimization</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Resource utilization</li>
+                    </ul>
+                    <a href="{% url 'timetable_generate' %}" class="btn btn-primary">
+                        Generate Now
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-exchange-alt me-2"></i>
+                        Smart Substitutions
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Intelligent substitute finding system that automatically handles staff leave and scheduling changes.</p>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check text-success me-2"></i>Automatic substitute matching</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Department-wise prioritization</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Workload balancing</li>
+                    </ul>
+                    <a href="{% url 'substitution_list' %}" class="btn btn-primary">
+                        Manage Substitutions
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-line me-2"></i>
+                        Analytics & Reports
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Comprehensive analytics and reporting system for better decision making and optimization.</p>
+                    <ul class="list-unstyled">
+                        <li><i class="fas fa-check text-success me-2"></i>Resource utilization reports</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Staff workload analysis</li>
+                        <li><i class="fas fa-check text-success me-2"></i>Export capabilities</li>
+                    </ul>
+                    <button class="btn btn-primary" onclick="loadStatistics()">
+                        View Analytics
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="card mb-5">
+        <div class="card-header">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-lightning-bolt me-2"></i>
+                Quick Actions
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                    <a href="{% url 'staff_create' %}" class="btn btn-outline-primary w-100">
+                        <i class="fas fa-user-plus d-block mb-2"></i>
+                        Add Staff
+                    </a>
+                </div>
+                <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                    <a href="{% url 'subject_create' %}" class="btn btn-outline-primary w-100">
+                        <i class="fas fa-book-plus d-block mb-2"></i>
+                        Add Subject
+                    </a>
+                </div>
+                <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                    <a href="{% url 'class_create' %}" class="btn btn-outline-primary w-100">
+                        <i class="fas fa-plus-circle d-block mb-2"></i>
+                        Add Class
+                    </a>
+                </div>
+                <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                    <a href="{% url 'room_create' %}" class="btn btn-outline-primary w-100">
+                        <i class="fas fa-door-closed d-block mb-2"></i>
+                        Add Room
+                    </a>
+                </div>
+                <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                    <a href="{% url 'substitution_create' %}" class="btn btn-outline-primary w-100">
+                        <i class="fas fa-exchange-alt d-block mb-2"></i>
+                        Create Substitution
+                    </a>
+                </div>
+                <div class="col-lg-2 col-md-4 col-sm-6 mb-3">
+                    <button class="btn btn-outline-primary w-100" onclick="resolveConflicts()">
+                        <i class="fas fa-tools d-block mb-2"></i>
+                        Resolve Conflicts
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Team Information -->
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">
+                <i class="fas fa-info-circle me-2"></i>
+                About This System
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-lg-8">
+                    <h6 class="fw-bold">Smart Timetable Generation System</h6>
+                    <p class="text-muted mb-3">
+                        An intelligent timetable management system powered by advanced Genetic Algorithm for educational institutions. 
+                        The system automatically generates optimal schedules while considering staff availability, room constraints, 
+                        lab requirements, and elective subjects across departments.
+                    </p>
+                    
+                    <h6 class="fw-bold">Key Features:</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success me-2"></i>Genetic Algorithm optimization</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Automatic conflict resolution</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Smart substitution engine</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Multi-department support</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul class="list-unstyled">
+                                <li><i class="fas fa-check text-success me-2"></i>Lab session management</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Elective subject handling</li>
+                                <li><i class="fas fa-check text-success me-2"></i>MongoDB integration</li>
+                                <li><i class="fas fa-check text-success me-2"></i>Real-time analytics</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-4">
+                    <div class="text-center">
+                        <div class="team-badge mb-3 d-inline-block">
+                            <i class="fas fa-users me-2"></i>
+                            TEAM SPIDERMERN
+                        </div>
+                        <div class="mb-2">
+                            <strong>Developed by:</strong>
+                        </div>
+                        <div class="text-muted">
+                            <div>SANJAY B</div>
+                            <div>YASWANTH ST</div>
+                            <div>ABISHECK AM</div>
+                        </div>
+                        <div class="mt-3">
+                            <small class="text-muted">
+                                <i class="fas fa-database me-1"></i>MongoDB: localhost:27017<br>
+                                <i class="fas fa-database me-1"></i>Database: TIMETABLE
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analytics Modal -->
+    <div class="modal fade" id="analyticsModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">System Analytics</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="analyticsContent">
+                        <div class="text-center">
+                            <i class="fas fa-spinner fa-spin fa-2x text-primary"></i>
+                            <p class="mt-2">Loading analytics...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function loadStatistics() {
+        // Show analytics modal
+        const modal = new bootstrap.Modal(document.getElementById('analyticsModal'));
+        modal.show();
+        
+        // Fetch statistics from API
+        fetch('{% url "api_statistics" %}')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    displayAnalytics(data.data);
+                } else {
+                    document.getElementById('analyticsContent').innerHTML = 
+                        '<div class="alert alert-danger">Error loading analytics: ' + data.error + '</div>';
+                }
+            })
+            .catch(error => {
+                document.getElementById('analyticsContent').innerHTML = 
+                    '<div class="alert alert-danger">Network error: ' + error.message + '</div>';
+            });
+    }
+    
+    function displayAnalytics(data) {
+        const content = `
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title">System Overview</h6>
+                            <ul class="list-unstyled">
+                                <li>Staff: ${data.overview.total_staff}</li>
+                                <li>Subjects: ${data.overview.total_subjects}</li>
+                                <li>Classes: ${data.overview.total_classes}</li>
+                                <li>Rooms: ${data.overview.total_rooms}</li>
+                                <li>Active Timetables: ${data.overview.total_timetables}</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title">Resource Utilization</h6>
+                            <div class="mb-2">
+                                <small>Room Utilization</small>
+                                <div class="progress">
+                                    <div class="progress-bar" style="width: ${data.utilization.room_utilization}%">
+                                        ${data.utilization.room_utilization}%
+                                    </div>
+                                </div>
+                            </div>
+                            <small class="text-muted">
+                                ${data.utilization.occupied_room_slots} / ${data.utilization.total_room_slots} slots occupied
+                            </small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title">Staff Workload Distribution</h6>
+                            <div class="mb-2">
+                                <small>Average Utilization: ${data.workload.average_utilization}%</small>
+                            </div>
+                            <div style="max-height: 200px; overflow-y: auto;">
+                                ${data.workload.staff_workloads.map(staff => `
+                                    <div class="d-flex justify-content-between align-items-center mb-1">
+                                        <small>${staff.name}</small>
+                                        <small>${staff.current_load}/${staff.max_load} (${staff.utilization}%)</small>
+                                    </div>
+                                    <div class="progress mb-2" style="height: 4px;">
+                                        <div class="progress-bar ${staff.utilization > 80 ? 'bg-danger' : staff.utilization > 60 ? 'bg-warning' : 'bg-success'}" 
+                                             style="width: ${staff.utilization}%"></div>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        document.getElementById('analyticsContent').innerHTML = content;
+    }
+    
+    function resolveConflicts() {
+        const button = event.target;
+        const originalText = button.innerHTML;
+        showLoading(button);
+        
+        // Call conflict resolution API
+        fetch('{% url "api_conflict_resolution" %}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({
+                'academic_year': '2024-25',
+                'semester': 1
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            hideLoading(button, originalText);
+            if (data.success) {
+                alert(`Conflict resolution completed!\nTotal conflicts: ${data.data.total_conflicts}\nResolved: ${data.data.resolved_conflicts}\nResolution rate: ${(data.data.resolution_rate * 100).toFixed(1)}%`);
+            } else {
+                alert('Error resolving conflicts: ' + data.error);
+            }
+        })
+        .catch(error => {
+            hideLoading(button, originalText);
+            alert('Network error: ' + error.message);
+        });
+    }
+</script>
+{% endblock %}

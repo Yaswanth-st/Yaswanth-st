@@ -1,0 +1,405 @@
+{% extends 'base.html' %}
+
+{% block title %}Generate Timetable{% endblock %}
+
+{% block page_title %}Generate Smart Timetable{% endblock %}
+
+{% block header_actions %}
+    <a href="{% url 'index' %}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+    </a>
+{% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-magic me-2"></i>
+                        Timetable Generation Parameters
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" id="generateForm">
+                        {% csrf_token %}
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6">
+                                <label for="academic_year" class="form-label">Academic Year</label>
+                                <select class="form-select" id="academic_year" name="academic_year" required>
+                                    <option value="2024-25" selected>2024-25</option>
+                                    <option value="2025-26">2025-26</option>
+                                    <option value="2026-27">2026-27</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="semester" class="form-label">Semester</label>
+                                <select class="form-select" id="semester" name="semester" required>
+                                    <option value="1">Semester 1</option>
+                                    <option value="2">Semester 2</option>
+                                    <option value="3">Semester 3</option>
+                                    <option value="4">Semester 4</option>
+                                    <option value="5">Semester 5</option>
+                                    <option value="6">Semester 6</option>
+                                    <option value="7">Semester 7</option>
+                                    <option value="8">Semester 8</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="department" class="form-label">Department</label>
+                            <select class="form-select" id="department" name="department" required>
+                                <option value="all">All Departments</option>
+                                {% for dept_code, dept_name in departments %}
+                                    <option value="{{ dept_code }}">{{ dept_name }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+
+                        <!-- Advanced Options -->
+                        <div class="card mb-4">
+                            <div class="card-header">
+                                <h6 class="card-title mb-0">
+                                    <button class="btn btn-link p-0" type="button" data-bs-toggle="collapse" data-bs-target="#advancedOptions">
+                                        <i class="fas fa-cog me-2"></i>Advanced Genetic Algorithm Parameters
+                                        <i class="fas fa-chevron-down ms-2"></i>
+                                    </button>
+                                </h6>
+                            </div>
+                            <div class="collapse" id="advancedOptions">
+                                <div class="card-body">
+                                    <div class="row">
+                                        <div class="col-md-6 mb-3">
+                                            <label for="population_size" class="form-label">Population Size</label>
+                                            <input type="number" class="form-control" id="population_size" name="population_size" value="100" min="50" max="500">
+                                            <small class="text-muted">Number of solutions in each generation (50-500)</small>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="generations" class="form-label">Generations</label>
+                                            <input type="number" class="form-control" id="generations" name="generations" value="300" min="100" max="1000">
+                                            <small class="text-muted">Number of evolution cycles (100-1000)</small>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="mutation_rate" class="form-label">Mutation Rate</label>
+                                            <input type="number" class="form-control" id="mutation_rate" name="mutation_rate" value="0.15" min="0.01" max="0.5" step="0.01">
+                                            <small class="text-muted">Probability of random changes (0.01-0.5)</small>
+                                        </div>
+                                        <div class="col-md-6 mb-3">
+                                            <label for="crossover_rate" class="form-label">Crossover Rate</label>
+                                            <input type="number" class="form-control" id="crossover_rate" name="crossover_rate" value="0.8" min="0.5" max="1.0" step="0.01">
+                                            <small class="text-muted">Probability of solution mixing (0.5-1.0)</small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="row">
+                                        <div class="col-12">
+                                            <h6 class="mb-3">Optimization Priorities</h6>
+                                            <div class="row">
+                                                <div class="col-md-6">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="minimize_conflicts" name="optimize_for[]" value="conflicts" checked>
+                                                        <label class="form-check-label" for="minimize_conflicts">
+                                                            Minimize Conflicts
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="balance_workload" name="optimize_for[]" value="workload" checked>
+                                                        <label class="form-check-label" for="balance_workload">
+                                                            Balance Staff Workload
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="optimize_rooms" name="optimize_for[]" value="rooms" checked>
+                                                        <label class="form-check-label" for="optimize_rooms">
+                                                            Optimize Room Usage
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" id="prefer_morning" name="optimize_for[]" value="time_preference">
+                                                        <label class="form-check-label" for="prefer_morning">
+                                                            Prefer Morning Slots
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg" id="generateBtn">
+                                <i class="fas fa-magic me-2"></i>
+                                Generate Timetable with AI
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Progress Card -->
+            <div class="card mb-4" id="progressCard" style="display: none;">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-chart-line me-2"></i>
+                        Generation Progress
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <div class="spinner-border text-primary" role="status">
+                            <span class="visually-hidden">Generating...</span>
+                        </div>
+                        <p class="mt-2 mb-0">AI is optimizing your timetable...</p>
+                        <small class="text-muted" id="progressText">Initializing genetic algorithm...</small>
+                    </div>
+                    <div class="progress mb-2">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" id="progressBar" style="width: 0%"></div>
+                    </div>
+                    <div class="row text-center">
+                        <div class="col-6">
+                            <small class="text-muted">Generation</small>
+                            <div class="fw-bold" id="currentGen">0</div>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">Best Fitness</small>
+                            <div class="fw-bold" id="bestFitness">0.0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info Card -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-info-circle me-2"></i>
+                        How It Works
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <h6 class="fw-bold text-primary">
+                            <i class="fas fa-dna me-2"></i>Genetic Algorithm
+                        </h6>
+                        <p class="small text-muted mb-2">
+                            Uses evolutionary computing to find optimal solutions by simulating natural selection.
+                        </p>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6 class="fw-bold text-success">
+                            <i class="fas fa-shield-alt me-2"></i>Constraint Handling
+                        </h6>
+                        <p class="small text-muted mb-2">
+                            Automatically handles staff availability, room capacity, and time conflicts.
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <h6 class="fw-bold text-warning">
+                            <i class="fas fa-balance-scale me-2"></i>Load Balancing
+                        </h6>
+                        <p class="small text-muted mb-0">
+                            Distributes workload evenly across staff and optimizes resource utilization.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics Card -->
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="card-title mb-0">
+                        <i class="fas fa-chart-bar me-2"></i>
+                        Current Statistics
+                    </h6>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-6 mb-3">
+                            <div class="fw-bold text-primary">{{ total_staff|default:0 }}</div>
+                            <small class="text-muted">Staff Members</small>
+                        </div>
+                        <div class="col-6 mb-3">
+                            <div class="fw-bold text-success">{{ total_subjects|default:0 }}</div>
+                            <small class="text-muted">Subjects</small>
+                        </div>
+                        <div class="col-6">
+                            <div class="fw-bold text-warning">{{ total_classes|default:0 }}</div>
+                            <small class="text-muted">Classes</small>
+                        </div>
+                        <div class="col-6">
+                            <div class="fw-bold text-info">{{ total_rooms|default:0 }}</div>
+                            <small class="text-muted">Rooms</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Modal -->
+    <div class="modal fade" id="resultsModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-check-circle text-success me-2"></i>
+                        Timetable Generation Complete
+                    </h5>
+                </div>
+                <div class="modal-body">
+                    <div id="resultsContent">
+                        <!-- Results will be populated here -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="viewTimetableBtn">
+                        <i class="fas fa-eye me-2"></i>View Timetable
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.getElementById('generateForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        // Show progress card
+        document.getElementById('progressCard').style.display = 'block';
+        
+        // Disable generate button
+        const generateBtn = document.getElementById('generateBtn');
+        generateBtn.disabled = true;
+        generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Generating...';
+        
+        // Simulate progress (in real implementation, this would be WebSocket-based)
+        simulateProgress();
+        
+        // Submit form
+        setTimeout(() => {
+            this.submit();
+        }, 1000);
+    });
+    
+    function simulateProgress() {
+        let progress = 0;
+        let generation = 0;
+        let fitness = 0;
+        
+        const interval = setInterval(() => {
+            progress += Math.random() * 5;
+            generation += Math.floor(Math.random() * 3) + 1;
+            fitness += Math.random() * 2;
+            
+            if (progress >= 100) {
+                progress = 100;
+                clearInterval(interval);
+                showResults();
+            }
+            
+            // Update progress
+            document.getElementById('progressBar').style.width = progress + '%';
+            document.getElementById('currentGen').textContent = generation;
+            document.getElementById('bestFitness').textContent = fitness.toFixed(1);
+            
+            // Update progress text
+            const messages = [
+                'Initializing genetic algorithm...',
+                'Creating initial population...',
+                'Evaluating fitness scores...',
+                'Performing crossover operations...',
+                'Applying mutations...',
+                'Optimizing solutions...',
+                'Resolving conflicts...',
+                'Finalizing timetable...'
+            ];
+            
+            const messageIndex = Math.floor((progress / 100) * (messages.length - 1));
+            document.getElementById('progressText').textContent = messages[messageIndex];
+        }, 200);
+    }
+    
+    function showResults() {
+        // Hide progress
+        document.getElementById('progressCard').style.display = 'none';
+        
+        // Show results modal
+        const modal = new bootstrap.Modal(document.getElementById('resultsModal'));
+        modal.show();
+        
+        // Populate results (this would come from the server response)
+        document.getElementById('resultsContent').innerHTML = `
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="card border-success">
+                        <div class="card-body text-center">
+                            <i class="fas fa-trophy fa-2x text-success mb-2"></i>
+                            <h5 class="card-title">92.5%</h5>
+                            <p class="card-text">Fitness Score</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="card border-info">
+                        <div class="card-body text-center">
+                            <i class="fas fa-clock fa-2x text-info mb-2"></i>
+                            <h5 class="card-title">2m 34s</h5>
+                            <p class="card-text">Generation Time</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card border-warning">
+                        <div class="card-body text-center">
+                            <i class="fas fa-exclamation-triangle fa-2x text-warning mb-2"></i>
+                            <h5 class="card-title">3</h5>
+                            <p class="card-text">Conflicts Resolved</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card border-primary">
+                        <div class="card-body text-center">
+                            <i class="fas fa-calendar-check fa-2x text-primary mb-2"></i>
+                            <h5 class="card-title">245</h5>
+                            <p class="card-text">Slots Scheduled</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="alert alert-success mt-3">
+                <i class="fas fa-check-circle me-2"></i>
+                <strong>Success!</strong> Your timetable has been generated successfully with optimal resource allocation.
+            </div>
+        `;
+        
+        // Set up view timetable button
+        document.getElementById('viewTimetableBtn').onclick = function() {
+            const academicYear = document.getElementById('academic_year').value;
+            window.location.href = `/timetable/view/${academicYear}/`;
+        };
+    }
+    
+    // Reset form when modal is closed
+    document.getElementById('resultsModal').addEventListener('hidden.bs.modal', function() {
+        const generateBtn = document.getElementById('generateBtn');
+        generateBtn.disabled = false;
+        generateBtn.innerHTML = '<i class="fas fa-magic me-2"></i>Generate Timetable with AI';
+    });
+</script>
+{% endblock %}

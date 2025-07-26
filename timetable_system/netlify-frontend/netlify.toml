@@ -1,0 +1,75 @@
+[build]
+  # Build command (not needed for static site)
+  command = "echo 'Static site - no build required'"
+  
+  # Publish directory
+  publish = "."
+
+[build.environment]
+  # Node.js version (if needed for any build tools)
+  NODE_VERSION = "18"
+
+# Redirect rules
+[[redirects]]
+  # SPA fallback - redirect all requests to index.html for client-side routing
+  from = "/app/*"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  # API redirects - redirect API calls to backend (when deployed)
+  from = "/api/*"
+  to = "https://your-backend-api.herokuapp.com/api/:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  # Admin panel redirect
+  from = "/admin/*"
+  to = "https://your-backend-api.herokuapp.com/admin/:splat"
+  status = 200
+  force = true
+
+# Headers for security and performance
+[[headers]]
+  for = "/*"
+  [headers.values]
+    # Security headers
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    
+    # Performance headers
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "/*.html"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+# Custom error pages
+[[redirects]]
+  from = "/*"
+  to = "/404.html"
+  status = 404
+
+# Form handling (if needed)
+[build.processing]
+  skip_processing = false
+
+[build.processing.css]
+  bundle = true
+  minify = true
+
+[build.processing.js]
+  bundle = true
+  minify = true
+
+[build.processing.html]
+  pretty_urls = true
